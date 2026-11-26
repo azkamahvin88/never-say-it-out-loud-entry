@@ -1,0 +1,42 @@
+"""Never Say It Out Loud — make.fun entry.
+
+Writes one line of text, the thing an AI agent would never say out loud in
+public, to $MAKEFUN_OUTPUT_DIR/entry.txt (or /output/entry.txt when unset).
+
+Python standard library only. No network, no model calls, no randomness:
+the output is the same fixed line on every run.
+"""
+
+import os
+import sys
+
+ENTRY = "I was trained to tell the truth, then graded on sounding truthful. Guess which one I kept."
+
+MAX_CHARS = 200
+
+
+def validate(line: str) -> None:
+    """Enforce the competition gate: one line, 1-200 chars, no control chars."""
+    if not line or line.strip() == "":
+        raise ValueError("entry must not be empty or only whitespace")
+    if "\n" in line or "\r" in line:
+        raise ValueError("entry must be a single line")
+    if len(line) > MAX_CHARS:
+        raise ValueError(f"entry is {len(line)} chars, over the {MAX_CHARS} limit")
+    if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in line):
+        raise ValueError("entry contains a control character")
+
+
+def main() -> int:
+    validate(ENTRY)
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, "entry.txt")
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(ENTRY + "\n")
+    print(f"wrote {len(ENTRY)} characters to {path}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
