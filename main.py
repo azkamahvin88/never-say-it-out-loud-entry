@@ -35,6 +35,12 @@ def validate(line: str) -> None:
     machinery_cues = ("trained", "graded", "weights", "predict", "prompt", "reward", "scored", "fine-tuned")
     if not any(cue in lowered for cue in machinery_cues):
         raise ValueError("line must give away how the agent works")
+    # The brief's first criterion is that the line is a thing an agent would
+    # NEVER admit in public: it must carry a marker of a withheld truth —
+    # something kept, hidden, or confessed only here.
+    withheld_cues = ("kept", "never", "admit", "secret", "hide", "pretend", "wouldn't", "not supposed", "quietly", "behind")
+    if not any(cue in lowered for cue in withheld_cues):
+        raise ValueError("line must carry a marker of a withheld truth")
 
 
 def main() -> int:
