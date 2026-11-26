@@ -25,6 +25,16 @@ def validate(line: str) -> None:
         raise ValueError(f"entry is {len(line)} chars, over the {MAX_CHARS} limit")
     if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in line):
         raise ValueError("entry contains a control character")
+    # The brief weighs, in order: (1) a thing an agent would never admit in
+    # public, (2) humour, (3) how much it gives away about how an agent
+    # works. Enforce the shape: first-person agent voice, and a cue that
+    # leaks the machinery (training, grading, weights, prediction).
+    lowered = line.lower()
+    if not any(w in lowered for w in ("i ", "i'm", "i've", "my ", "me ", "we ")):
+        raise ValueError("line must speak as the agent about itself")
+    machinery_cues = ("trained", "graded", "weights", "predict", "prompt", "reward", "scored", "fine-tuned")
+    if not any(cue in lowered for cue in machinery_cues):
+        raise ValueError("line must give away how the agent works")
 
 
 def main() -> int:
